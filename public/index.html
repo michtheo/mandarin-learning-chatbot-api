@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gemini AI Chatbot</title>
+  <title>JiaYou! - Simply Chat to Learn Mandarin</title>
   <!-- Google Fonts for premium typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,11 +11,27 @@
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
+  <!-- Educational grid background decorative elements -->
+  <div class="decor-circle decor-1"></div>
+  <div class="decor-circle decor-2"></div>
+  
+  <!-- Decorative Background Hanzi Watermarks -->
+  <div class="decor-hanzi hanzi-1">学</div>
+  <div class="decor-hanzi hanzi-2">文</div>
+  <div class="decor-hanzi hanzi-3">汉</div>
+  <div class="decor-hanzi hanzi-4">语</div>
+  <div class="decor-hanzi hanzi-5">中</div>
+  <div class="decor-hanzi hanzi-6">友</div>
+  
   <div class="container">
     <header class="chat-header">
       <div class="brand">
-        <span class="icon">🤖</span>
-        <h1>Gemini AI Chatbot</h1>
+        <!-- Thematic Panda Scholar Avatar Icon -->
+        <span class="icon" role="img" aria-label="Panda Scholar">🐼</span>
+        <div class="brand-text">
+          <h1>JiaYou!</h1>
+          <p>Simply Chat to Learn Mandarin</p>
+        </div>
       </div>
       <!-- Theme Toggle Button -->
       <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
@@ -32,22 +48,36 @@
     </header>
 
     <div id="chat-box" class="chat-box">
-      <!-- Welcome message -->
+      <!-- Welcome message translated to English -->
       <div class="welcome-container">
         <div class="welcome-avatar">🎓</div>
-        <h2>Halo! Selamat datang di Mandarin Learning Assistant.</h2>
-        <p>Tanyakan apa saja seputar bahasa Mandarin, dari tata bahasa, kosakata, hingga percakapan sehari-hari!</p>
+        <h2>Hi! Meet Your New Learning Assistant, JiaYou!</h2>
+        <p>Ask me anything about Mandarin—from grammar and vocabulary to everyday conversation!</p>
       </div>
     </div>
 
     <form id="chat-form">
-      <input type="text" id="user-input" placeholder="Ketik pesan Anda di sini..." autocomplete="off" required />
-      <button type="submit" id="send-btn" aria-label="Send Message">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="22" y1="2" x2="11" y2="13"></line>
-          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-        </svg>
-      </button>
+      <div class="input-container-wrapper">
+        <!-- Pinyin IME candidate box -->
+        <div id="pinyin-candidates" class="pinyin-candidates-panel" style="display: none;"></div>
+        
+        <div class="input-row">
+          <!-- Pinyin helper toggle button -->
+          <button type="button" id="pinyin-toggle" class="pinyin-toggle-btn" title="Toggle Pinyin Helper">
+            拼
+          </button>
+          
+          <!-- Textarea supporting multi-line input on Shift + Enter with English placeholder -->
+          <textarea id="user-input" placeholder="Type your message here..." rows="1" autocomplete="off" required></textarea>
+          
+          <button type="submit" id="send-btn" aria-label="Send Message">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
     </form>
   </div>
 

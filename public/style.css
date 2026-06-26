@@ -1,54 +1,69 @@
 /* Design Tokens & Theme Variables */
 :root {
-  /* Light Theme */
-  --bg-primary: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-  --bg-container: #ffffff;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --border-color: #e2e8f0;
-  --chat-bg: #f8fafc;
+  /* Light Theme - Soft Coral/Peach Theme matching icons and buttons */
+  --bg-primary: #fff6f5;
+  --bg-container: rgba(255, 255, 255, 0.95);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border-color: #fddcd8;
+  --chat-bg: #fffbfb;
+  --grid-dot: rgba(255, 94, 98, 0.09); /* Soft coral grid dots */
+  --decor-color-1: rgba(255, 94, 98, 0.16); /* Warm coral highlight blob */
+  --decor-color-2: rgba(255, 153, 102, 0.16); /* Warm peach highlight blob */
+  
+  /* Brand Avatar Background (Vibrant Orange-Red representing Mandarin theme) */
+  --brand-avatar-bg: linear-gradient(135deg, #ff5e62 0%, #ff9966 100%);
+  --brand-avatar-shadow: rgba(255, 94, 98, 0.3);
   
   /* User Message: Colorful Coral-Pink Gradient */
   --user-bg: linear-gradient(135deg, #ff5e62 0%, #ff9966 100%);
   --user-text: #ffffff;
-  --user-shadow: rgba(255, 94, 98, 0.25);
+  --user-shadow: rgba(255, 94, 98, 0.2);
   
-  /* Bot Message: Gentle Pastel Lavender-Cyan Gradient */
-  --bot-bg: linear-gradient(135deg, #f0f4ff 0%, #e6fffa 100%);
-  --bot-text: #1e293b;
-  --bot-border: #dbeafe;
-  --bot-shadow: rgba(99, 102, 241, 0.05);
+  /* Bot Message: Soft Coral/Teal Tint for friendly educational look */
+  --bot-bg: linear-gradient(135deg, #fffbfb 0%, #fff3f2 100%);
+  --bot-text: #7f1d1d;
+  --bot-border: #fecaca;
+  --bot-shadow: rgba(239, 68, 68, 0.02);
 
-  --accent-color: #6366f1;
-  --accent-hover: #4f46e5;
-  --shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.08);
+  --accent-color: #ff5e62;
+  --accent-hover: #e04a4e;
+  --shadow: 0 20px 50px -12px rgba(255, 94, 98, 0.08);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --border-radius: 16px;
+  --border-radius: 20px;
 }
 
 [data-theme="dark"] {
   /* Dark Theme */
-  --bg-primary: #0f172a;
-  --bg-container: #1e293b;
+  --bg-primary: #0b0f19;
+  --bg-container: rgba(22, 28, 45, 0.95);
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
-  --border-color: #334155;
-  --chat-bg: #0f172a;
+  --border-color: #1e293b;
+  --chat-bg: #0b0f19;
+  --grid-dot: rgba(255, 255, 255, 0.03);
+  --decor-color-1: rgba(255, 94, 98, 0.08); /* Coral blob in dark mode too */
+  --decor-color-2: rgba(255, 153, 102, 0.08);
   
-  /* User Message: Neon Violet-Magenta Gradient */
-  --user-bg: linear-gradient(135deg, #d946ef 0%, #8b5cf6 100%);
+  /* Brand Avatar: Kept orange/coral gradient in dark mode */
+  --brand-avatar-bg: linear-gradient(135deg, #ff5e62 0%, #ff9966 100%);
+  --brand-avatar-shadow: rgba(255, 94, 98, 0.3);
+  
+  /* User Message: Kept warm orange-coral gradient in dark mode */
+  --user-bg: linear-gradient(135deg, #ff5e62 0%, #ff9966 100%);
   --user-text: #ffffff;
-  --user-shadow: rgba(217, 70, 239, 0.25);
+  --user-shadow: rgba(255, 94, 98, 0.25);
   
-  /* Bot Message: Deep Slate with subtle Indigo border */
-  --bot-bg: #293548;
+  /* Bot Message in Dark Mode: Clean, stylish slate-indigo with warm subtle border */
+  --bot-bg: #1f293d;
   --bot-text: #f1f5f9;
-  --bot-border: #3b82f633;
-  --bot-shadow: rgba(0, 0, 0, 0.2);
+  --bot-border: rgba(255, 94, 98, 0.25); /* Glowing coral border */
+  --bot-shadow: rgba(0, 0, 0, 0.3);
 
-  --accent-color: #3b82f6;
-  --accent-hover: #2563eb;
-  --shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.3);
+  /* Orange Submit Button and highlights in dark mode */
+  --accent-color: #ff5e62;
+  --accent-hover: #e04a4e;
+  --shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 /* Base Styles */
@@ -60,7 +75,10 @@
 
 body {
   font-family: 'Outfit', sans-serif;
-  background: var(--bg-primary);
+  background-color: var(--bg-primary);
+  /* Educational grid notebook background pattern with dynamic gradient transition */
+  background: var(--bg-primary) radial-gradient(var(--grid-dot) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
   color: var(--text-primary);
   min-height: 100vh;
   display: flex;
@@ -68,6 +86,93 @@ body {
   align-items: center;
   transition: var(--transition);
   padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Floating Blur Circle Highlights */
+.decor-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.decor-1 {
+  width: 400px;
+  height: 400px;
+  background-color: var(--decor-color-1);
+  top: -10%;
+  left: -10%;
+}
+
+.decor-2 {
+  width: 500px;
+  height: 500px;
+  background-color: var(--decor-color-2);
+  bottom: -15%;
+  right: -10%;
+}
+
+/* Decorative Background Hanzi Watermarks - Opacity Sharpened slightly */
+.decor-hanzi {
+  position: absolute;
+  font-family: 'STKaiti', 'Kaiti SC', 'Georgia', serif;
+  font-weight: 700;
+  color: var(--accent-color);
+  opacity: 0.09; /* Sharpened from 0.05 to 0.09 */
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  transition: var(--transition);
+}
+
+[data-theme="dark"] .decor-hanzi {
+  opacity: 0.05; /* Sharpened from 0.025 to 0.05 */
+  color: var(--accent-color);
+}
+
+.hanzi-1 {
+  font-size: 8rem;
+  top: 6%;
+  left: 5%;
+  transform: rotate(-15deg);
+}
+
+.hanzi-2 {
+  font-size: 6rem;
+  top: 55%;
+  left: 6%;
+  transform: rotate(20deg);
+}
+
+.hanzi-3 {
+  font-size: 7rem;
+  top: 12%;
+  right: 6%;
+  transform: rotate(15deg);
+}
+
+.hanzi-4 {
+  font-size: 9rem;
+  top: 65%;
+  right: 5%;
+  transform: rotate(-25deg);
+}
+
+.hanzi-5 {
+  font-size: 7.5rem;
+  top: 38%;
+  left: 88%;
+  transform: rotate(10deg);
+}
+
+.hanzi-6 {
+  font-size: 5rem;
+  top: 2%;
+  left: 45%;
+  transform: rotate(-5deg);
 }
 
 /* Main Container */
@@ -75,16 +180,19 @@ body {
   width: 100%;
   max-width: 650px;
   background: var(--bg-container);
-  border-radius: 24px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 28px;
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  height: 80vh;
+  height: 85vh;
   min-height: 550px;
   max-height: 850px;
   overflow: hidden;
   border: 1px solid var(--border-color);
   transition: var(--transition);
+  z-index: 10;
 }
 
 /* Header Area */
@@ -92,24 +200,54 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 18px 24px;
+  background: transparent;
   border-bottom: 1px solid var(--border-color);
+  z-index: 20;
 }
 
 .chat-header .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
 }
 
+/* Panda Scholar Icon Container */
 .chat-header .brand .icon {
-  font-size: 24px;
+  font-size: 28px;
+  background: var(--brand-avatar-bg);
+  box-shadow: 0 6px 16px var(--brand-avatar-shadow);
+  border-radius: 16px;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
 }
 
-.chat-header h1 {
-  font-size: 1.25rem;
-  font-weight: 600;
+.chat-header .brand:hover .icon {
+  transform: scale(1.08) rotate(5deg);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-text h1 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
   color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.brand-text p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin: 0;
 }
 
 /* Theme Toggle Button */
@@ -171,27 +309,35 @@ body {
   justify-content: center;
   text-align: center;
   margin: auto;
-  max-width: 80%;
-  padding: 20px;
-  color: var(--text-secondary);
+  max-width: 85%;
+  padding: 30px 24px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
+}
+
+[data-theme="dark"] .welcome-container {
+  background: rgba(25, 33, 53, 0.4);
 }
 
 .welcome-avatar {
-  font-size: 48px;
+  font-size: 52px;
   margin-bottom: 16px;
-  animation: bounce 2s infinite;
+  animation: bounce 2.2s infinite;
 }
 
 .welcome-container h2 {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .welcome-container p {
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
 }
 
 /* Chat Message Bubbles */
@@ -203,6 +349,7 @@ body {
   font-size: 0.95rem;
   display: inline-block;
   word-wrap: break-word;
+  white-space: pre-wrap; /* Support multi-line layout formatting for shift+enter and model responses */
   animation: slideIn 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.15) forwards;
 }
 
@@ -279,6 +426,29 @@ body {
   margin: 10px 0;
 }
 
+/* Markdown Tables */
+.message.bot table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 0.9rem;
+}
+
+.message.bot th, .message.bot td {
+  border: 1px solid var(--bot-border);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.message.bot th {
+  background-color: rgba(0, 0, 0, 0.03);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .message.bot th {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
 /* Thinking Indicator State */
 .message.thinking {
   font-style: italic;
@@ -291,34 +461,145 @@ form {
   display: flex;
   padding: 16px 20px;
   background: var(--bg-container);
-  border-top: 1px solid var(--border-color);
-  gap: 12px;
-  align-items: center;
+  /* border-top: 1px solid var(--border-color); -> Removed to eliminate line next to message input */
+  align-items: flex-end; /* Align inputs and button to bottom when text expands */
   transition: var(--transition);
 }
 
-input[type="text"] {
+/* Pinyin Input Wrapper */
+.input-container-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-row {
+  display: flex;
+  width: 100%;
+  gap: 12px;
+  align-items: flex-end; /* Match form alignment */
+}
+
+/* Pinyin toggle button */
+.pinyin-toggle-btn {
+  background-color: var(--chat-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+  margin-bottom: 1px; /* Align with input box base */
+}
+
+.pinyin-toggle-btn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  transform: scale(1.05);
+}
+
+.pinyin-toggle-btn.active {
+  background: var(--user-bg);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px var(--user-shadow);
+}
+
+/* Candidates Dropdown Panel (positioned above input) */
+.pinyin-candidates-panel {
+  position: absolute;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+  background: var(--bg-container);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 10px 14px;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+[data-theme="dark"] .pinyin-candidates-panel {
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.candidate-item {
+  background-color: var(--chat-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 6px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: var(--transition);
+  font-family: 'Outfit', sans-serif;
+  border: 1px solid var(--border-color);
+}
+
+.candidate-item:hover {
+  background: var(--user-bg);
+  color: white;
+  border-color: transparent;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px var(--user-shadow);
+}
+
+/* Textarea styling replacing the input[type="text"] */
+#user-input {
   flex: 1;
   padding: 12px 20px;
-  border-radius: 30px;
+  border-radius: 22px;
   border: 1px solid var(--border-color);
   background-color: var(--chat-bg);
   color: var(--text-primary);
   font-size: 0.95rem;
   outline: none;
   font-family: inherit;
-  transition: var(--transition);
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+  resize: none; /* Disable manual expansion grabber */
+  height: 44px; /* Matches form height */
+  max-height: 130px; /* Expands dynamically to 4-5 lines then scrolls */
+  line-height: 1.4;
+  overflow-y: auto;
 }
 
-input[type="text"]:focus {
+#user-input:focus {
   border-color: var(--accent-color);
   background-color: var(--bg-container);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 94, 98, 0.15);
 }
 
-input[type="text"]:disabled {
+#user-input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  background-color: var(--border-color);
+}
+
+#user-input::-webkit-scrollbar {
+  width: 4px;
+}
+#user-input::-webkit-scrollbar-track {
+  background: transparent;
+}
+#user-input::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 10px;
 }
 
 button[type="submit"] {
@@ -334,6 +615,8 @@ button[type="submit"] {
   cursor: pointer;
   transition: var(--transition);
   flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(255, 94, 98, 0.2);
+  margin-bottom: 1px; /* Align with input box base */
 }
 
 button[type="submit"] svg {
@@ -374,6 +657,17 @@ button[type="submit"]:disabled {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
