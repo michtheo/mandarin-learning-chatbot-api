@@ -5,9 +5,10 @@ const chatBox = document.getElementById('chat-box');
 const themeToggleBtn = document.getElementById('theme-toggle');
 const pinyinToggleBtn = document.getElementById('pinyin-toggle');
 const pinyinCandidatesPanel = document.getElementById('pinyin-candidates');
+const micBtn = document.getElementById('mic-btn');
 
 // Maintain conversation history in the structure expected by the API:
-// { role: "user" | "model", text: string }
+// { role: "user" | "model", text?: string, audio?: { mimeType: string, data: string } }
 let conversationHistory = [];
 
 // ==========================================
@@ -196,8 +197,103 @@ function hideCandidates() {
 
 
 // ==========================================
-// 3. Chat Submit & API Interaction Logic
+// 3. Voice Recording (MediaRecorder API)
 // ==========================================
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+let audioStream = null;
+
+// Start recording audio
+async function startRecording() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert("Microphone recording is not supported in this browser.");
+    return;
+  }
+
+  audioChunks = [];
+  try {
+    audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    
+    // Choose appropriate mime type supported by the browser
+    let options = {};
+    if (MediaRecorder.isTypeSupported('audio/webm')) {
+      options = { mimeType: 'audio/webm' };
+    } else if (MediaRecorder.isTypeSupported('audio/ogg')) {
+      options = { mimeType: 'audio/ogg' };
+    }
+
+    mediaRecorder = new MediaRecorder(audioStream, options);
+
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        audioChunks.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstop = async () => {
+      const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      // Convert audio blob to base64
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      reader.onloadend = async () => {
+        const base64Data = reader.result.split(',')[1];
+        const mimeType = audioBlob.type || 'audio/webm';
+        
+        // Send the audio file to the API
+        await sendVoiceMessage(base64Data, mimeType, audioUrl);
+      };
+    };
+
+    mediaRecorder.start();
+    isRecording = true;
+    micBtn.classList.add('recording');
+    input.placeholder = "Recording voice... Click mic to stop & send.";
+    input.disabled = true;
+  } catch (error) {
+    console.error('Error accessing microphone:', error);
+    alert('Could not access microphone. Please check your browser permissions.');
+    stopRecordingState();
+  }
+}
+
+// Stop recording audio
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+  }
+  stopRecordingState();
+}
+
+function stopRecordingState() {
+  isRecording = false;
+  micBtn.classList.remove('recording');
+  input.placeholder = pinyinActive ? "Type pinyin (e.g. 'nihao')..." : "Type your message here...";
+  input.disabled = false;
+  
+  if (audioStream) {
+    audioStream.getTracks().forEach(track => track.stop());
+    audioStream = null;
+  }
+}
+
+// Toggle recording click handler
+micBtn.addEventListener('click', () => {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+});
+
+
+// ==========================================
+// 4. API Communication Logic
+// ==========================================
+
+// Handle text form submission
 form.addEventListener('submit', async function (e) {
   e.preventDefault();
 
@@ -209,20 +305,43 @@ form.addEventListener('submit', async function (e) {
   input.style.height = 'auto';
   hideCandidates();
 
-  // Add the user's message to the UI & history
+  // Add user message to UI and history
   appendMessage('user', userMessage);
   conversationHistory.push({ role: 'user', text: userMessage });
 
+  await fetchChatResponse();
+});
+
+// Handle sending recorded audio message
+async function sendVoiceMessage(base64Data, mimeType, audioUrl) {
+  // Add audio message to UI (bubble with audio controls)
+  appendMessage('user', '', audioUrl);
+
+  // Add audio message to conversation history
+  conversationHistory.push({
+    role: 'user',
+    text: '',
+    audio: {
+      mimeType: mimeType,
+      data: base64Data
+    }
+  });
+
+  await fetchChatResponse();
+}
+
+// Fetch generated content response from backend
+async function fetchChatResponse() {
   // Show a temporary "Thinking..." bot message
   const thinkingElement = appendMessage('bot', 'Thinking...');
 
-  // Disable form inputs during the request to prevent double submission
+  // Disable form inputs during the request
   const submitButton = form.querySelector('button[type="submit"]');
   input.disabled = true;
   if (submitButton) submitButton.disabled = true;
+  micBtn.disabled = true;
 
   try {
-    // Send the user's message as a POST request to /api/chat
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
@@ -237,13 +356,12 @@ form.addEventListener('submit', async function (e) {
 
     const data = await response.json();
 
-    // Replace "Thinking..." with the AI's reply rendered from Markdown to HTML
     if (data && data.result) {
       const aiReply = data.result;
       
       thinkingElement.classList.remove('thinking');
       
-      // Translate Markdown to HTML using marked library, with textContent fallback
+      // Render Markdown to HTML
       if (typeof marked !== 'undefined') {
         thinkingElement.innerHTML = marked.parse(aiReply);
       } else {
@@ -258,34 +376,33 @@ form.addEventListener('submit', async function (e) {
   } catch (error) {
     console.error('Failed to get chat response:', error);
     
-    // Show error message to user
     thinkingElement.classList.remove('thinking');
     thinkingElement.textContent = 'Sorry, no response received.';
     thinkingElement.style.color = '#ff6b6b';
 
-    // Remove the last user message from conversation history so that subsequent
-    // messages don't fail due to two consecutive 'user' roles in Gemini API
+    // Remove the last user message to keep conversation alternating
     conversationHistory.pop();
   } finally {
-    // Re-enable form inputs and focus on input field
+    // Re-enable form inputs
     input.disabled = false;
     if (submitButton) submitButton.disabled = false;
+    micBtn.disabled = false;
     input.focus();
 
-    // Auto scroll chat box to the latest message
+    // Auto scroll chat box to bottom
     chatBox.scrollTop = chatBox.scrollHeight;
   }
-});
+}
 
 /**
- * Appends a message to the chat box inside a clearing container wrapper
- * to prevent float alignment issues in style.css.
+ * Appends a message bubble (optionally with an audio player) to the chat box.
  * 
  * @param {string} sender - 'user' or 'bot'
- * @param {string} text - The message content
+ * @param {string} text - The message content text
+ * @param {string} [audioUrl] - Optional local audio player source URL
  * @returns {HTMLDivElement} The actual message content element
  */
-function appendMessage(sender, text) {
+function appendMessage(sender, text, audioUrl = null) {
   // Hide welcome container when the first message is sent
   const welcomeContainer = document.querySelector('.welcome-container');
   if (welcomeContainer) {
@@ -305,10 +422,23 @@ function appendMessage(sender, text) {
   if (text === 'Thinking...') {
     msg.classList.add('thinking');
     msg.textContent = text;
-  } else if (sender === 'bot' && typeof marked !== 'undefined') {
-    msg.innerHTML = marked.parse(text);
-  } else {
-    msg.textContent = text;
+  } else if (text) {
+    if (sender === 'bot' && typeof marked !== 'undefined') {
+      msg.innerHTML = marked.parse(text);
+    } else {
+      msg.textContent = text;
+    }
+  }
+
+  // Render audio player if voice recording URL is provided
+  if (audioUrl) {
+    const audioPlayer = document.createElement('audio');
+    audioPlayer.src = audioUrl;
+    audioPlayer.controls = true;
+    audioPlayer.style.display = 'block';
+    audioPlayer.style.marginTop = '6px';
+    audioPlayer.style.maxWidth = '240px';
+    msg.appendChild(audioPlayer);
   }
 
   wrapper.appendChild(msg);
